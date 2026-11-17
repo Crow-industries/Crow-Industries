@@ -1,0 +1,685 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CROW Industries</title>
+<style>
+:root{
+--bg:#090d12;--panel:#101720;--panel2:#151f2a;--line:#263442;
+--text:#e8eef4;--muted:#8d9ba9;--white:#fff;
+--gold:#d9a441;--cyan:#47c6dc;--violet:#a98bdf;
+--green:#75c69a;--red:#d97878;--radius:13px;--sidebar:258px
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}
+.app{min-height:100vh;display:flex}
+.sidebar{width:var(--sidebar);position:fixed;inset:0 auto 0 0;background:#0c1219;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:22px 15px;z-index:10;overflow-y:auto}
+.brand{padding:7px 11px 25px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.brand-name{font-size:19px;font-weight:800;letter-spacing:2px}
+.brand-sub{color:var(--muted);font-size:10px;letter-spacing:2px;margin-top:3px}
+.nav-label{color:#667686;font-size:10px;letter-spacing:1.8px;font-weight:800;padding:0 11px;margin:17px 0 8px}
+.nav-link{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;padding:10px 11px;border:1px solid transparent;border-radius:9px;background:transparent;color:#aab6c2;margin:2px 0;transition:.18s}
+.nav-link:hover,.roadmap-item:hover{background:#151f2a;color:white}
+.nav-link.active{background:#1a2632;border-color:#344453;color:white}
+.nav-main{display:flex;align-items:center;gap:10px}
+.nav-icon{width:19px;text-align:center;color:#8191a0}
+.nav-status{font-size:9px;color:#d7ad60;border:1px solid #6c552d;border-radius:20px;padding:2px 6px;white-space:nowrap}
+.nav-status.incomplete{color:#d99b9b;border-color:#704747}
+.sidebar-spacer{flex:1;min-height:18px}
+.roadmap{border-top:1px solid var(--line);padding-top:16px;margin-top:18px}
+.roadmap-item{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;color:#aab6c2;font-size:11px;border:0;background:transparent;border-radius:7px;text-align:left}
+.roadmap-state{font-size:9px;color:var(--muted)}
+.roadmap-state.active{color:var(--gold)}
+.sidebar-foot{font-size:10px;color:#637181;padding:17px 10px 0}
+.main{margin-left:var(--sidebar);width:calc(100% - var(--sidebar));min-width:0}
+.topbar{height:65px;position:sticky;top:0;z-index:8;background:rgba(9,13,18,.91);backdrop-filter:blur(15px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px;gap:15px}
+.breadcrumb{font-size:12px;color:var(--muted)}
+.top-actions{display:flex;align-items:center;gap:9px}
+.search-trigger,.top-button{background:#121b25;border:1px solid var(--line);border-radius:8px;color:#aab6c2;padding:8px 11px;font-size:11px}
+.search-trigger{min-width:210px;text-align:left;display:flex;justify-content:space-between;gap:15px}
+.search-trigger:hover,.top-button:hover{border-color:#526273;color:white}
+kbd{font:10px ui-monospace,monospace;color:#82909e;border:1px solid #394654;border-radius:4px;padding:2px 5px}
+.content{max-width:1320px;margin:auto;padding:38px 38px 80px}
+.page{display:none;animation:fade .22s ease}.page.active{display:block}
+@keyframes fade{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}
+.eyebrow{font-size:10px;letter-spacing:2.2px;color:var(--muted);font-weight:800;text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(29px,4vw,46px);line-height:1.1;letter-spacing:-1.4px;margin:0 0 15px}
+h2{font-size:22px;letter-spacing:-.5px;margin:0 0 12px}
+h3{font-size:15px;margin:0 0 7px}
+p{color:#aab6c2;margin:0 0 13px}
+.lead{font-size:16px;line-height:1.7;max-width:760px;color:#aab6c2}
+.muted{color:var(--muted)}.rule{height:1px;background:var(--line);margin:28px 0}
+.hero{padding:42px;border:1px solid #2c3946;border-radius:17px;background:radial-gradient(ellipse at 85% 0%,#202e3b 0,transparent 48%),linear-gradient(135deg,#121b25,#0d131a);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:260px;height:260px;border:1px solid #344453;border-radius:50%;right:-100px;bottom:-170px;box-shadow:0 0 0 25px #26344222,0 0 0 55px #26344216}
+.hero .eyebrow{color:#a7b6c4}.hero h1,.hero p{max-width:700px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px;position:relative;z-index:1}
+.btn{border:1px solid #3a4a59;background:#1a2733;color:white;border-radius:8px;padding:10px 15px;font-weight:650;font-size:12px}
+.btn:hover{background:#263746}.btn.primary{background:#d9a441;color:#111820;border-color:#d9a441}
+.btn.primary:hover{background:#e9b956}.btn.subtle{background:transparent}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:19px;min-width:0}
+.card.clickable{cursor:pointer;transition:.18s}.card.clickable:hover{transform:translateY(-2px);border-color:#526273;background:#131d27}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.card-icon{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:#263442;color:#c5d0da;font-size:15px}
+.accent-gold{--accent:var(--gold)}.accent-cyan{--accent:var(--cyan)}.accent-violet{--accent:var(--violet)}
+.division-card{border-top:2px solid var(--accent)}.division-card .card-icon{color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,transparent)}
+.division-card h3{color:var(--accent)}
+.status{font-size:9px;text-transform:uppercase;letter-spacing:1px;border:1px solid #41634f;color:#8fd0a8;border-radius:20px;padding:4px 8px;font-weight:800}
+.status.incomplete{border-color:#694848;color:#d99b9b}.status.progress{border-color:#6a552d;color:#e2bd70}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin:32px 0 15px}
+.section-head p{margin:0;font-size:12px}
+.tag{font-size:10px;color:#9eabb8;background:#1a2632;border:1px solid #344453;border-radius:5px;padding:4px 7px}
+.game-search{width:100%;background:#0d141c;border:1px solid var(--line);border-radius:9px;color:white;padding:12px 14px;outline:none}
+.game-search:focus,.field:focus{border-color:#60788c}
+.game-card{min-height:150px;display:flex;flex-direction:column;justify-content:space-between}
+.game-card h3{font-size:17px}.game-card .game-meta{display:flex;justify-content:space-between;align-items:center;margin-top:15px}
+.game-card.trail{border-top:2px solid var(--gold)}.game-card .arrow{color:#7d8d9c}.game-card.disabled{opacity:.78}
+.empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed #344453;border-radius:9px}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px;margin:25px 0 20px}
+.tab{background:transparent;color:#8998a6;border:1px solid transparent;border-radius:7px;padding:9px 12px;font-size:11px;font-weight:700}
+.tab:hover{color:white;background:#141e28}.tab.active{color:white;background:#1b2935;border-color:#3a4b5b}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.category-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:17px 0}
+.category-tab{background:#111a23;border:1px solid var(--line);border-radius:6px;padding:7px 10px;color:#9ba9b6;font-size:10px}
+.category-tab.active{background:#283745;border-color:#647789;color:white}
+.block-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.block-item{padding:13px;background:#111a23;border:1px solid #293745;border-radius:9px;cursor:pointer;text-align:left;color:var(--text);min-width:0}
+.block-item:hover{border-color:#687b8d;background:#17232e}
+.block-item strong{display:block;font-size:12px;margin-bottom:4px}.block-item small{color:var(--muted);font-size:10px}
+.block-detail{background:#111a23;border:1px solid #344453;border-radius:12px;padding:20px;margin-top:16px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:16px}
+.stat{background:#0b1219;border:1px solid #273542;border-radius:8px;padding:11px}
+.stat span{display:block;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.stat strong{display:block;font-size:13px;margin-top:5px;overflow-wrap:anywhere}
+.back-link{border:0;background:transparent;color:#a9b8c6;padding:0;margin-bottom:14px;font-size:11px}
+.back-link:hover{color:white}
+.guide-list{display:grid;gap:10px}
+.guide{background:#111a23;border:1px solid #2b3946;border-radius:10px;padding:16px}
+.guide summary{cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:15px}
+.guide summary::-webkit-details-marker{display:none}.guide summary:after{content:"+";color:#91a2b2;font-size:17px}
+.guide[open] summary:after{content:"−"}.guide p{font-size:12px;margin:12px 0 0}
+.example{background:#0a1118;border-left:2px solid var(--cyan);padding:11px 13px;margin-top:12px;color:#b8c5d0;font-size:11px;border-radius:0 6px 6px 0}
+.callout{background:#111c26;border:1px solid #304252;border-radius:10px;padding:15px;margin:15px 0}
+.callout strong{color:#dce5ec}.callout p{font-size:12px;margin:5px 0 0}
+.field{width:100%;background:#0c141c;border:1px solid #334250;border-radius:7px;color:white;padding:10px;outline:none}
+textarea.field{min-height:100px;resize:vertical}.field-label{display:block;font-size:11px;color:#aab6c2;margin:12px 0 6px}
+.search-overlay{position:fixed;inset:0;background:#000b;z-index:30;display:none;align-items:flex-start;justify-content:center;padding:14vh 18px 20px}
+.search-overlay.open{display:flex}.search-box{width:min(620px,100%);background:#111a23;border:1px solid #40505e;border-radius:13px;box-shadow:0 20px 80px #0009;overflow:hidden}
+.search-box input{width:100%;padding:18px;background:transparent;border:0;border-bottom:1px solid var(--line);color:white;outline:none;font-size:15px}
+.search-results{max-height:360px;overflow:auto;padding:8px}.search-result{display:block;width:100%;text-align:left;padding:11px;border:0;border-radius:7px;background:transparent;color:#dce5ec}
+.search-result:hover{background:#243341}.search-result small{display:block;color:var(--muted);margin-top:2px}
+.search-empty{padding:20px;color:var(--muted);text-align:center}
+.footer{border-top:1px solid var(--line);padding-top:18px;margin-top:45px;color:#647382;font-size:10px;display:flex;justify-content:space-between;gap:12px}
+.preference-row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:13px 0;border-bottom:1px solid var(--line)}
+.preference-row small{display:block;color:var(--muted);margin-top:3px}
+.source-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.source-links a{font-size:10px;color:#b9c9d6;border:1px solid #344453;background:#111a23;padding:7px 9px;border-radius:6px}
+.source-links a:hover{border-color:#71899b;color:white}
+body.compact .content{padding-top:24px}body.compact .card{padding:14px}
+body.reduce-motion *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media(max-width:950px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.block-list{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding:28px 24px 60px}}
+@media(max-width:700px){
+.sidebar{position:relative;width:100%;height:auto;max-height:none;border-right:0;border-bottom:1px solid var(--line);padding:12px;display:block}
+.brand{padding:7px 8px 12px;margin-bottom:9px}.nav-label{margin:10px 4px 5px}
+.sidebar nav{display:flex;flex-wrap:wrap;gap:4px}.nav-link{width:auto;padding:8px 9px;font-size:11px;margin:0}
+.nav-status{display:none}.sidebar-spacer{display:none}.roadmap{padding-top:9px;margin-top:10px}
+.roadmap .nav-label{margin-top:0}.roadmap-list{display:flex;flex-wrap:wrap;gap:3px}
+.roadmap-item{padding:6px 8px;font-size:10px}.sidebar-foot{display:none}
+.app{display:block}.main{margin:0;width:100%}.topbar{height:55px;padding:0 14px}
+.search-trigger{min-width:0;width:160px;padding:7px 8px}.content{padding:24px 15px 50px}
+.hero{padding:25px 20px}.grid,.grid.two{grid-template-columns:1fr}
+.block-list{grid-template-columns:repeat(2,minmax(0,1fr))}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.section-head{align-items:start;flex-direction:column;gap:5px}
+}
+@media(max-width:390px){.block-list{grid-template-columns:1fr}.search-trigger{width:125px}.top-button{padding:7px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand"><div class="brand-name">CROW INDUSTRIES</div><div class="brand-sub">INDEPENDENT DIVISIONS. SHARED VISION.</div></div>
+<div class="nav-label">COMPANY</div>
+<nav id="mainNav">
+<button class="nav-link active" data-page="overview"><span class="nav-main"><span class="nav-icon">◈</span>Overview</span></button>
+<button class="nav-link" data-page="about"><span class="nav-main"><span class="nav-icon">▤</span>About CROW</span></button>
+<div class="nav-label" style="width:100%">DIVISIONS</div>
+<button class="nav-link" data-page="gaming"><span class="nav-main"><span class="nav-icon">⌁</span>CROW Gaming</span><span class="nav-status">ACTIVE</span></button>
+<button class="nav-link" data-page="technologies"><span class="nav-main"><span class="nav-icon">⌘</span>CROW Technologies</span><span class="nav-status incomplete">INCOMPLETE</span></button>
+<button class="nav-link" data-page="engineering"><span class="nav-main"><span class="nav-icon">⌬</span>CROW Engineering</span><span class="nav-status incomplete">INCOMPLETE</span></button>
+</nav>
+<div class="sidebar-spacer"></div>
+<section class="roadmap"><div class="nav-label">ROADMAP</div><div class="roadmap-list">
+<button class="roadmap-item" data-page="gaming"><span>CROW Gaming</span><span class="roadmap-state active">IN DEVELOPMENT</span></button>
+<button class="roadmap-item" data-page="technologies"><span>CROW Technologies</span><span class="roadmap-state">INCOMPLETE</span></button>
+<button class="roadmap-item" data-page="engineering"><span>CROW Engineering</span><span class="roadmap-state">INCOMPLETE</span></button>
+</div></section>
+<div class="sidebar-foot">CROW INDUSTRIES · INTERNAL PORTAL</div>
+</aside>
+
+<main class="main">
+<header class="topbar"><div class="breadcrumb" id="breadcrumb">CROW Industries / Overview</div>
+<div class="top-actions"><button class="search-trigger" id="openSearch"><span>Search CROW...</span><kbd>⌘ K</kbd></button><button class="top-button" id="openPreferences" title="Preferences">⚙</button></div>
+</header>
+<div class="content">
+
+<section class="page active" id="page-overview">
+<div class="hero"><div class="eyebrow">CROW INDUSTRIES · COMPANY PORTAL</div><h1>Building ideas into something greater.</h1>
+<p class="lead">CROW Industries is the parent organization behind three independent divisions, each with its own focus, identity, and projects.</p>
+<div class="hero-actions"><button class="btn primary" data-page="gaming">Explore CROW Gaming</button><button class="btn subtle" data-page="about">About the company</button></div></div>
+<div class="section-head"><div><div class="eyebrow">THE ORGANIZATION</div><h2>Our divisions</h2></div><p>One parent company. Three distinct directions.</p></div>
+<div class="grid">
+<article class="card division-card accent-gold clickable" data-page="gaming"><div class="card-top"><div class="card-icon">⌁</div><span class="status progress">In development</span></div><h3>CROW Gaming</h3><p>Game-focused projects, reference libraries, guides, and community resources.</p><span class="muted">Explore division →</span></article>
+<article class="card division-card accent-cyan clickable" data-page="technologies"><div class="card-top"><div class="card-icon">⌘</div><span class="status incomplete">Incomplete</span></div><h3>CROW Technologies</h3><p>Software, tools, digital systems, and experimental technology projects.</p><span class="muted">Explore division →</span></article>
+<article class="card division-card accent-violet clickable" data-page="engineering"><div class="card-top"><div class="card-icon">⌬</div><span class="status incomplete">Incomplete</span></div><h3>CROW Engineering</h3><p>Design, development, and engineering-focused projects and concepts.</p><span class="muted">Explore division →</span></article>
+</div>
+<div class="section-head"><div><div class="eyebrow">CURRENT PRIORITY</div><h2>Project spotlight</h2></div></div>
+<article class="card clickable" data-page="trailmakers"><div class="card-top"><div class="card-icon" style="color:var(--gold)">✦</div><span class="tag">CROW Gaming</span></div><h3>Trailmakers Resource Center</h3><p>A growing reference hub with a block library, logic guidebook, and general building guides.</p><span class="muted">Open Trailmakers resources →</span></article>
+</section>
+
+<section class="page" id="page-about">
+<div class="eyebrow">THE PARENT COMPANY</div><h1>About CROW Industries</h1>
+<p class="lead">CROW Industries serves as the parent identity for three independent divisions. Each division can develop its own projects and visual identity while remaining part of the larger organization.</p><div class="rule"></div>
+<div class="grid two">
+<article class="card"><h3>Independent divisions</h3><p>Gaming, Technologies, and Engineering each have separate areas of focus.</p></article>
+<article class="card"><h3>Shared foundation</h3><p>The divisions share the CROW Industries parent organization, portal, and broader company direction.</p></article>
+<article class="card"><h3>Development approach</h3><p>Projects are introduced as they become ready. Incomplete sections are labeled clearly.</p></article>
+<article class="card"><h3>Visual identity</h3><p>The company uses a dark industrial foundation. Each division has its own accent color: gold, cyan, and violet.</p></article>
+</div>
+</section>
+
+<section class="page" id="page-gaming">
+<div class="eyebrow" style="color:var(--gold)">DIVISION 01 · CROW INDUSTRIES</div><h1 style="color:var(--gold)">CROW Gaming</h1>
+<p class="lead">Game resources, reference material, guides, and project-specific tools. Trailmakers is the first active resource project.</p>
+<div class="section-head"><div><div class="eyebrow">GAME LIBRARY</div><h2>Explore supported games</h2></div><p>Search the library by game title.</p></div>
+<input class="game-search" id="gameSearch" placeholder="Search games..." autocomplete="off"><div class="grid" id="gameGrid" style="margin-top:14px"></div>
+<div class="callout"><strong>Development note</strong><p>Trailmakers is the first resource center being prepared. Other game entries will receive content as development progresses.</p></div>
+</section>
+
+<section class="page" id="page-trailmakers">
+<div class="eyebrow" style="color:var(--gold)">CROW GAMING · GAME RESOURCE CENTER</div><h1>Trailmakers</h1>
+<p class="lead">A reference center for building, block information, logic systems, and general gameplay knowledge.</p>
+<div class="tabs" id="trailTabs"><button class="tab active" data-tab="blocks">Block Library</button><button class="tab" data-tab="logic">Logic Guide Book</button><button class="tab" data-tab="general">General Guide Book</button></div>
+
+<div class="tab-panel active" id="tab-blocks">
+<div class="section-head" style="margin-top:0"><div><div class="eyebrow">REFERENCE DATABASE</div><h2>Block Library</h2></div><span class="tag" id="blockCount">Loading blocks</span></div>
+<p>Browse the available non-combat blocks. Select any entry to inspect its recorded properties.</p>
+<input class="game-search" id="blockSearch" placeholder="Search blocks by name, category, or description...">
+<div class="category-tabs" id="categoryTabs"></div><div class="block-list" id="blockList"></div><div id="blockDetail"></div>
+<div class="callout"><strong>Data quality note</strong><p>“Not listed” means a source did not provide a reliable value in the material checked. “Not applicable” means the property does not apply. Grid dimensions are in block units; one grid unit is 0.25 metres per side.</p></div>
+<div class="source-links">
+<a href="https://trailmakers.wiki.gg/wiki/Blocks" target="_blank" rel="noopener">Official Wiki · Blocks</a>
+<a href="https://trailmakers.wiki.gg/wiki/Seats" target="_blank" rel="noopener">Seats</a>
+<a href="https://trailmakers.wiki.gg/wiki/Frame_Blocks" target="_blank" rel="noopener">Frame Blocks</a>
+<a href="https://trailmakers.wiki.gg/wiki/Aerodynamic_Blocks" target="_blank" rel="noopener">Aerodynamic Blocks</a>
+<a href="https://trailmakers.wiki.gg/wiki/Mechanical_Blocks" target="_blank" rel="noopener">Mechanical Blocks</a>
+<a href="https://trailmakers.wiki.gg/wiki/Gadgets" target="_blank" rel="noopener">Gadgets</a>
+<a href="https://trailmakers.wiki.gg/wiki/Logic_Blocks" target="_blank" rel="noopener">Logic Blocks</a>
+</div>
+</div>
+
+<div class="tab-panel" id="tab-logic">
+<div class="eyebrow">SYSTEMS & AUTOMATION</div><h2>Logic Guide Book</h2>
+<p>Logic blocks process signals from sensors and other logic blocks. The examples here focus on harmless indicators, displays, and general vehicle automation.</p>
+<div class="callout"><strong>How signals work</strong><p>The wiki describes logic outputs as signal values. For ordinary gates, the combined inputs determine whether the gate produces an output. Math blocks can process numeric values beyond the ordinary gate signal range. Check each block's in-game configuration for its available timing, delay, input, and output settings.</p></div>
+<div class="guide-list" id="logicGuides"></div>
+</div>
+
+<div class="tab-panel" id="tab-general">
+<div class="eyebrow">BUILDING KNOWLEDGE</div><h2>General Guide Book</h2>
+<p>General construction principles and useful building practices for Trailmakers.</p><div class="guide-list" id="generalGuides"></div>
+</div>
+</section>
+
+<section class="page" id="page-technologies">
+<div class="eyebrow" style="color:var(--cyan)">DIVISION 02 · CROW INDUSTRIES</div><div class="card-top"><h1 style="color:var(--cyan);margin:0">CROW Technologies</h1><span class="status incomplete">Incomplete</span></div>
+<p class="lead">Software, digital tools, and technology development. This division is still being established.</p><div class="rule"></div>
+<div class="card division-card accent-cyan"><div class="card-top"><div class="card-icon">⌘</div><span class="tag">Featured project</span></div><h2 style="color:var(--cyan)">CROW Intelligence</h2><p>Computational Reasoning &amp; Optimization Workbench — an AI-assisted coding and development environment.</p><p class="muted" style="font-size:11px">The project is under development. This page is a showcase, not a live product launch.</p></div>
+</section>
+
+<section class="page" id="page-engineering">
+<div class="eyebrow" style="color:var(--violet)">DIVISION 03 · CROW INDUSTRIES</div><div class="card-top"><h1 style="color:var(--violet);margin:0">CROW Engineering</h1><span class="status incomplete">Incomplete</span></div>
+<p class="lead">Design, engineering, and development projects. This division is currently being planned.</p><div class="rule"></div>
+<div class="grid two"><article class="card division-card accent-violet"><h3>Design &amp; development</h3><p>Future projects involving product concepts, design processes, and engineering development.</p></article><article class="card division-card accent-violet"><h3>Project inquiries</h3><p>Use this preview form to outline a project idea. It does not send or store information online.</p></article></div>
+<div class="card" style="margin-top:14px"><h3>Project inquiry preview</h3><label class="field-label" for="inquiryName">Project name</label><input class="field" id="inquiryName" placeholder="Name of your project"><label class="field-label" for="inquiryDescription">Project description</label><textarea class="field" id="inquiryDescription" placeholder="Describe the idea..."></textarea><button class="btn" id="previewInquiry" style="margin-top:12px">Preview inquiry</button><div id="inquiryPreview" class="callout" hidden></div></div>
+</section>
+
+<section class="page" id="page-preferences">
+<div class="eyebrow">LOCAL SETTINGS</div><h1>Preferences</h1><p class="lead">These settings are saved in this browser on this device.</p>
+<div class="card" style="margin-top:25px">
+<div class="preference-row"><div><strong>Compact layout</strong><small>Reduce spacing throughout the website.</small></div><input type="checkbox" id="prefCompact"></div>
+<div class="preference-row"><div><strong>Reduce animations</strong><small>Disable most interface transitions and animations.</small></div><input type="checkbox" id="prefMotion"></div>
+<div class="preference-row"><div><strong>Remember last page</strong><small>Return to the last page you visited.</small></div><input type="checkbox" id="prefRemember"></div>
+<button class="btn subtle" id="resetPrefs" style="margin-top:16px">Reset preferences</button>
+</div>
+</section>
+<footer class="footer"><span>CROW INDUSTRIES · COMPANY PORTAL</span><span>Independent divisions · Shared vision</span></footer>
+</div>
+</main>
+</div>
+
+<div class="search-overlay" id="searchOverlay"><div class="search-box">
+<input id="globalSearch" placeholder="Search pages, games, and Trailmakers blocks..." autocomplete="off">
+<div class="search-results" id="searchResults"><div class="search-empty">Start typing to search CROW Industries.</div></div>
+</div></div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const pageNames={overview:"Overview",about:"About CROW",gaming:"CROW Gaming",trailmakers:"Trailmakers",technologies:"CROW Technologies",engineering:"CROW Engineering",preferences:"Preferences"};
+
+const games=[
+{name:"Trailmakers",status:"Active",description:"Vehicle building, creative construction, and a growing resource library.",page:"trailmakers",active:true},
+{name:"Minecraft",status:"Incomplete",description:"A planned game resource section. Content has not been developed yet.",page:null},
+{name:"No Man’s Sky",status:"Planned",description:"A future entry in the CROW Gaming library.",page:null},
+{name:"Helldivers 2",status:"Planned",description:"A future entry in the CROW Gaming library.",page:null}
+];
+
+/*
+Block data format:
+[name, category, description, weight, size, HP, cores, power, aero, other]
+Only values found in the reviewed wiki extracts are entered.
+*/
+const rawBlocks=[
+/* SEATS */
+["Seat","Seats","Vehicle seat with fortified roll cage.","31.7666 kg","2 × 4 × 4","Not listed","N/A","N/A","1000","Aero class: orange"],
+["VIP Seat","Seats","A special seat for a VIP.","32.0166 kg","2 × 4 × 4","Not listed","N/A","N/A","1000","Aero class: yellow"],
+["Armoured Seat","Seats","A seat with high impact resistance.","50 kg","2 × 4 × 3","Not listed","N/A","N/A","1500","Aero class: olive"],
+["Cockpit","Seats","An aerodynamic flight seat.","25 kg","2 × 5 × 3","Not listed","N/A","N/A","1000","Aero class: green"],
+["Space Fighter Cockpit","Seats","A cockpit designed for a spaceship.","25 kg","2 × 6 × 3","Not listed","N/A","N/A","1000","Aero class: green"],
+["Large Cockpit","Seats","A large aerodynamic flight seat.","50 kg","4 × 6 × 5","Not listed","N/A","N/A","1000","Aero class: olive"],
+["Spaceship Cockpit","Seats","A cockpit for spaceship builds.","50 kg","4 × 4 × 4","Not listed","N/A","N/A","1000","Aero class: olive"],
+["Go-Kart Seat","Seats","A light seat with limited protection.","17.5 kg","2 × 4 × 3","Not listed","N/A","N/A","1000","Aero class: red"],
+["Operator Seat","Seats","An upright seat with stick controls for the pilot.","30 kg","2 × 3 × 4","Not listed","N/A","N/A","1000","Aero class: red"],
+["Diving Bell","Seats","An underwater seat for submersible vehicles.","30 kg","4 × 4 × 4","Not listed","N/A","N/A","1000","Aero class: olive"],
+["Motorcycle Seat","Seats","A seat for a motorcycle.","17.5 kg","3 × 4 × 3","Not listed","N/A","N/A","1000","Aero class: olive"],
+["Ship's Wheel","Seats","Used to steer a ship.","30 kg","4 × 2 × 5","Not listed","N/A","N/A","1000","Aero class: red"],
+["Crow's Nest","Seats","A raised ship steering position.","30 kg","4 × 4 × 5","Not listed","N/A","N/A","1000","Aero class: olive"],
+["Car Seat","Seats","A car seat.","Not listed","2 × 3 × 4","1000","N/A","N/A","Not listed",""],
+["Racing Seat","Seats","A racing seat.","Not listed","Not listed","1000","N/A","N/A","Not listed",""],
+["Chirpo Passenger Seat","Seats","Fits one Chirpo passenger.","10 kg","2 × 2 × 4","Not listed","N/A","N/A","1000","Aero class: red"],
+["Froggit Passenger Seat","Seats","A passenger seat for a Froggit.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+
+/* MOVEMENT / MECHANICAL */
+["Bulldawg Engine","Movement","High acceleration and low top speed.","9.4 kg","2 × 2 × 1","150","1","333","N/A",""],
+["RAW Engine","Movement","Low acceleration and high top speed.","59.6 kg","2 × 4 × 3","600","2","1700","N/A",""],
+["Dragon Engine","Movement","High acceleration and high top speed.","25 kg","2 × 2 × 2","250","3","3333","N/A",""],
+["Steering Hinge","Movement","Allows a limited angle of rotation; useful for steering.","0.5 kg","1 × 1 × 1","450","N/A","N/A","N/A",""],
+["Large Hinge","Movement","A larger limited-angle hinge.","1.1 kg","1 × 2 × 1","450","N/A","N/A","N/A",""],
+["Racing Hinge","Movement","A steering hinge intended for fast racing vehicles.","1.2 kg","2 × 2 × 1","Not listed","N/A","N/A","N/A",""],
+["Gyro","Movement","Adds rotational control and damping to a vehicle.","5.6 kg","1 × 2 × 2","200","1","N/A","N/A",""],
+["Gyro Stabilizer","Movement","Slowly rotates a vehicle toward the block's up direction.","5.6 kg","1 × 2 × 3","200","1","N/A","N/A",""],
+["Quantum Rudder","Movement","Rotates a structure in its direction of movement and can provide steering.","10 g","2 × 3 × 1","250","1","N/A","N/A","Wiki description notes a speed trade-off."],
+["Rotating Servo","Movement","A block that can slowly rotate in either direction.","5 kg","2 × 2 × 1","200","N/A","N/A","N/A",""],
+["Trailer Hinge","Movement","A ball hinge with two attachment points.","5 kg","2 × 2 × 1","200","N/A","N/A","N/A",""],
+["Suspension Spring","Movement","Absorbs shock to make a vehicle drive more smoothly.","0.5 kg","2 × 1 × 3","200","N/A","N/A","N/A",""],
+["Straight Suspension","Movement","Absorbs shock to make a vehicle drive more smoothly.","0.5 kg","Not listed","200","N/A","N/A","N/A",""],
+["Large Suspension","Movement","A larger suspension component.","Not listed","Not listed","Not listed","N/A","N/A","N/A",""],
+["Spinning Servo","Movement","A servo that can spin quickly.","9.1 kg","2 × 2 × 2","200","N/A","N/A","N/A",""],
+["Piston","Movement","An extendable cylinder that moves back and forth.","6.4 kg","1 × 1 × 4","200","N/A","N/A","N/A","Wiki lists common extension settings: 0.17, 0.33, 0.5, 0.67, 0.84."],
+["Hover Block","Movement","Generates an air cushion beneath the vehicle.","14.1 kg","4 × 4 × 1","Not listed","1","N/A","N/A","Can float over land or water at or above 32 km/h."],
+["Friction Pad","Movement","A rubber-like contact pad with high friction.","0.5 kg","1 × 1 × 1","Not listed","N/A","N/A","N/A",""],
+["Helicopter Engine","Movement","A rotating helicopter engine component.","5.6 kg","2 × 2 × 1","150","1","N/A","N/A",""],
+["Stackable Helicopter Engine","Movement","A helicopter engine with static top and bottom.","5.6 kg","2 × 2 × 1","150","1","N/A","N/A",""],
+["Aiming Servo","Movement","A servo with an aiming function.","Not listed","2 × 1 × 2","Not listed","N/A","N/A","N/A","Wiki lists a complexity cost of 7."],
+["Detachable Block","Movement","A block that detaches the structure connected to it.","1.6 kg","2 × 1 × 1","200","N/A","N/A","N/A",""],
+["Power Coupling","Movement","A flexible electrical connection between blocks.","0.3 kg","1 × 4 × 1","Not listed","1","N/A","200","Aero class: none"],
+
+/* STRUCTURE */
+["Block 1x2","Structure","Basic structural building block.","0.6 kg","1 × 2 × 1","Not listed","N/A","N/A","200","Aero class: red"],
+["Block 1x3","Structure","Basic structural building block.","0.9 kg","1 × 3 × 1","Not listed","N/A","N/A","200","Aero class: red"],
+["Block 1x4","Structure","Basic structural building block.","1.2 kg","1 × 4 × 1","Not listed","N/A","N/A","200","Aero class: red"],
+["Block 2x2","Structure","Basic structural building block.","Not listed","2 × 2 × 1","Not listed","N/A","N/A","Not listed",""],
+["Block 2x4","Structure","Basic structural building block.","2.5 kg","2 × 4 × 1","Not listed","N/A","N/A","200","Aero class: red"],
+["Block 2x2x2","Structure","Basic cubic structural building block.","2.5 kg","2 × 2 × 2","Not listed","N/A","N/A","200","Aero class: red"],
+["Block 4x4","Structure","Large flat structural building block.","Not listed","4 × 4 × 1","Not listed","N/A","N/A","Not listed",""],
+["Block 6x2","Structure","Long flat structural building block.","Not listed","6 × 2 × 1","Not listed","N/A","N/A","Not listed",""],
+["Block 4x8","Structure","Large structural building block.","10 kg","4 × 8 × 1","Not listed","N/A","N/A","400","Aero class: red"],
+["Grid Block 1x2","Structure","Grid-style frame block.","0.3 kg","1 × 2 × 1","200","N/A","N/A","N/A",""],
+["Grid Block 1x4","Structure","Grid-style frame block.","0.6 kg","1 × 4 × 1","200","N/A","N/A","N/A",""],
+["Flat Connector 1x2","Structure","Flat structural connector.","0.1 kg","1 × 2 × 1","Not listed","N/A","N/A","200","Aero class: none"],
+["Flat Connector 1x3","Structure","Flat structural connector.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Shield 2x1","Structure","Structural shield block.","0.6 kg","2 × 1 × 1","Not listed","N/A","N/A","200","Aero class: green"],
+["Shield 2x2","Structure","Structural shield block.","1.2 kg","2 × 2 × 1","Not listed","N/A","N/A","200","Aero class: green"],
+["Shield 2x4","Structure","Structural shield block.","2.5 kg","2 × 4 × 1","Not listed","N/A","N/A","200","Aero class: green"],
+["Short Truss Block","Structure","A short open truss frame.","Not listed","2 × 2 × 2","Not listed","N/A","N/A","Not listed",""],
+["Long Truss Block","Structure","A long open truss frame.","Not listed","2 × 2 × 8","Not listed","N/A","N/A","Not listed",""],
+["Small Porthole","Structure","A small porthole window.","1.2 kg","1 × 2 × 1","200","N/A","N/A","N/A",""],
+["Large Porthole","Structure","A large porthole window.","5 kg","4 × 4 × 3","300","N/A","N/A","N/A",""],
+["Airplane Window","Structure","A window block for aircraft builds.","1.1 kg","2 × 2 × 1","200","N/A","N/A","N/A",""],
+["Mast","Structure","A mast component; listed as High Seas DLC content.","5 kg","2 × 8 × 2","400","N/A","N/A","N/A",""],
+["Windshield","Structure","A windshield component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["L Bracket","Structure","An L-shaped structural bracket.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["U Bracket","Structure","A U-shaped structural bracket.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Small Fender","Structure","A small fender component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Medium Fender","Structure","A medium fender component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Large Fender","Structure","A large fender component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Weight Block","Structure","Adds mass to a vehicle.","30 kg","2 × 2 × 1","200","N/A","N/A","N/A",""],
+["Heavy Weight Block","Structure","Adds a larger amount of mass to a vehicle.","50 kg","2 × 2 × 1","200","N/A","N/A","N/A",""],
+
+/* STREAMLINING */
+["Wedge 1x2","Streamlining","A fairly aerodynamic angled block.","0.3 kg","1 × 2 × 1","Not listed","N/A","N/A","200","Aero rating: fairly; angle 45°"],
+["Wedge 2x1x2","Streamlining","A fairly aerodynamic angled block.","0.6 kg","2 × 1 × 2","Not listed","N/A","N/A","200","Aero rating: fairly; angle 45°"],
+["Wedge 2x2x2","Streamlining","A fairly aerodynamic angled block.","1.2 kg","2 × 2 × 2","Not listed","N/A","N/A","200","Aero rating: fairly; angle 45°"],
+["Wedge 2x4x2","Streamlining","A fairly aerodynamic angled block.","2.5 kg","2 × 4 × 2","Not listed","N/A","N/A","250","Aero rating: fairly; angle 45°"],
+["Wedge 2x1","Streamlining","A moderately aerodynamic angled block.","0.3 kg","2 × 1 × 1","Not listed","N/A","N/A","200","Aero rating: moderately; angle 26.6°"],
+["Wedge 3x1","Streamlining","A very aerodynamic wedge.","0.5 kg","3 × 1 × 1","Not listed","N/A","N/A","200","Aero rating: very; angle 18.4°"],
+["Wedge 4x1","Streamlining","An extremely aerodynamic wedge.","0.6 kg","4 × 1 × 1","Not listed","N/A","N/A","200","Aero rating: extremely; angle 14°"],
+["Cylinder 1x1x2","Streamlining","A fairly aerodynamic cylindrical block.","0.6 kg","1 × 1 × 2","Not listed","N/A","N/A","200","Aero rating: fairly"],
+["Rounded Wedge 2x1","Streamlining","A rounded wedge component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Rounded 2x1","Streamlining","A fairly aerodynamic rounded block.","0.6 kg","2 × 1 × 1","Not listed","N/A","N/A","200","Aero rating: fairly"],
+["Rounded 2x4","Streamlining","A fairly aerodynamic rounded block.","2.2 kg","2 × 4 × 1","Not listed","N/A","N/A","200","Aero rating: fairly"],
+["Rounded 1x2","Streamlining","A fairly aerodynamic rounded block.","0.5 kg","1 × 2 × 1","Not listed","N/A","N/A","200","Aero rating: fairly"],
+["Cone 2x2x1","Streamlining","A fairly aerodynamic cone.","1.2 kg","2 × 2 × 1","200","N/A","N/A","Not listed",""],
+["Cone 2x2x2","Streamlining","A fairly aerodynamic cone.","Not listed","2 × 2 × 2","200","N/A","N/A","Not listed","Wiki extraction reported an anomalous 2.5 g; deliberately not repeated as verified."],
+["Cone 1x1x2","Streamlining","A fairly aerodynamic cone.","0.6 kg","1 × 1 × 2","200","N/A","N/A","Not listed",""],
+["Rounded Corner 1x2","Streamlining","A rounded corner piece.","0.4 kg","2 × 1 × 1","Not listed","N/A","N/A","200","Aero rating: fairly"],
+["Rounded 2x1x2","Streamlining","A rounded block.","0.8 kg","2 × 1 × 2","Not listed","N/A","N/A","200","Aero rating: fairly"],
+["Rounded Corner 2x2x2","Streamlining","A rounded corner piece.","1.2 kg","2 × 2 × 2","Not listed","N/A","N/A","200","Aero rating: fairly"],
+["Rounded 2x4x2","Streamlining","A rounded block.","3.9 kg","2 × 4 × 2","Not listed","N/A","N/A","250","Aero rating: fairly"],
+["Rounded Corner Inverted 1x2","Streamlining","An inverted rounded corner piece.","0.2 kg","1 × 2 × 1","Not listed","N/A","N/A","200","Aero rating: fairly"],
+["Rounded Inverted 1x2","Streamlining","An inverted rounded piece.","0.3 kg","1 × 2 × 1","Not listed","N/A","N/A","200","Aero rating: fairly"],
+["Rounded Wedge Corner 2x2x2","Streamlining","A rounded wedge corner.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Rounded Wedge Corner 3x2x2","Streamlining","A rounded wedge corner.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Rounded Wedge Corner 4x2x2","Streamlining","A rounded wedge corner.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Quarter Cone 1x1x4","Streamlining","A quarter-cone shaping block.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Quarter Cone 1x1x3","Streamlining","A quarter-cone shaping block.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Rounded Wedge Corner 2x2","Streamlining","A rounded wedge corner.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+
+/* FLIGHT */
+["Front Wing","Flight","A wing component for vehicle aerodynamics.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Spoiler","Flight","Provides downforce to help a vehicle stay on the ground.","0.1 kg","4 × 2 × 1","200","N/A","N/A","Not listed",""],
+["Rear Wing","Flight","A rear wing component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Supercar Spoiler","Flight","A spoiler component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Small Aileron","Flight","A wing-end control surface for adjusting roll.","0.8 kg","2 × 2 × 1","250","N/A","N/A","Not listed",""],
+["Aileron","Flight","A control surface for adjusting roll.","1 kg","4 × 4 × 1","250","N/A","N/A","Not listed",""],
+["Elevator Tail","Flight","Tail fins used to control aircraft pitch.","2 kg","10 × 3 × 1","250","N/A","N/A","Not listed",""],
+["Big Elevator Fin","Flight","A large tail fin for controlling pitch.","1 kg","5 × 4 × 1","250","N/A","N/A","Not listed",""],
+["Small Elevator Fin","Flight","A small tail fin for controlling pitch.","1 kg","3 × 2 × 1","250","N/A","N/A","Not listed",""],
+["Small Modular Wing","Flight","Provides a small amount of lift.","1 kg","4 × 2 × 1","250","N/A","N/A","Not listed",""],
+["Small Flap Wing","Flight","A small wing with an integrated flap.","1 kg","4 × 2 × 1","250","N/A","N/A","Not listed",""],
+["Modular Wing","Flight","Provides a large amount of lift.","1.5 kg","4 × 4 × 1","250","N/A","N/A","Not listed",""],
+["Flap Wing","Flight","A wing with an integrated flap.","1.5 kg","4 × 4 × 1","250","N/A","N/A","Not listed",""],
+["Inflatable Balloon","Flight","A balloon that can inflate and deflate.","2.5 kg","6 × 6 × 6","300","N/A","N/A","Not listed",""],
+["Party Balloon","Flight","A small balloon that provides lift.","0.2 kg","3 × 3 × 5","25","N/A","N/A","Not listed",""],
+["Helicopter Blade","Flight","A helicopter rotor blade.","3.3 kg","2 × 8 × 1","250","N/A","N/A","Not listed",""],
+["Short Helicopter Blade","Flight","A short helicopter rotor blade.","1.9 kg","2 × 6 × 1","200","N/A","N/A","Not listed",""],
+["Long Helicopter Blade","Flight","A long helicopter rotor blade.","5.3 kg","2 × 16 × 1","400","N/A","N/A","Not listed",""],
+["Simple Tailfin","Flight","Provides aerodynamic drag and directional stability.","3 kg","1 × 5 × 3","250","N/A","N/A","Not listed",""],
+["Small Tailfin","Flight","A small fin providing drag and directional stability.","1.2 kg","1 × 2 × 2","200","N/A","N/A","Not listed",""],
+["Tailfin","Flight","A tailfin providing aerodynamic drag and directional stability.","4.6 kg","2 × 4 × 4","400","N/A","N/A","Not listed",""],
+["Powered Simple Tailfin","Flight","A tailfin with artificially enhanced drag.","3 kg","1 × 5 × 3","250","1","N/A","Not listed",""],
+["Powered Tailfin","Flight","A tailfin with artificially enhanced drag.","4.6 kg","2 × 4 × 4","400","1","N/A","Not listed",""],
+["Powered Small Tailfin","Flight","A small powered tailfin.","1.2 kg","1 × 2 × 2","200","1","N/A","Not listed",""],
+["Large Stabilizer","Flight","A large stabilizing flight component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Propeller","Flight","Provides propulsive power.","12.5 kg","2 × 2 × 1","150","2","Not listed","N/A",""],
+["Large Propeller","Flight","Provides a large amount of propulsive power.","25 kg","2 × 2 × 2","150","3","Not listed","N/A",""],
+["Tail Propeller","Flight","A tail-mounted propeller.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Rocket Thruster","Flight","A small jet engine with low thrust.","9.8 kg","1 × 2 × 1","200","1","60","N/A",""],
+["Thruster","Flight","A small jet engine with low thrust.","9.8 kg","1 × 2 × 2","200","1","80","N/A",""],
+["Space Thruster","Flight","A powerful thruster for spaceship builds.","15 kg","1 × 2 × 2","250","3","250","N/A",""],
+["RAW Jet","Flight","A powerful jet engine with a cooldown.","53.14 kg","2 × 5 × 2","200","2","750","N/A",""],
+["Dragon Jet","Flight","A powerful jet engine that does not overheat.","30 kg","2 × 3 × 2","250","3","300","N/A",""],
+["Large Jet","Flight","A large jet engine designed for large aircraft.","40 kg","4 × 8 × 5","400","5","800","N/A",""],
+["Rocket Engine","Flight","A large rocket engine with high power output.","100 kg","4 × 7 × 4","250","20","1800","N/A",""],
+["Gimbal Jet","Flight","A jet that directs thrust downward.","9.4 kg","2 × 2 × 1","200","1","Not listed","N/A",""],
+
+/* MARINE */
+["Small Pontoon","Marine","Provides buoyancy in water.","1 kg","1 × 2 × 1","200","N/A","N/A","N/A",""],
+["Medium Pontoon","Marine","Provides buoyancy in water.","3 kg","2 × 4 × 2","250","N/A","N/A","N/A",""],
+["Large Pontoon","Marine","Provides buoyancy in water.","12 kg","4 × 8 × 4","600","N/A","N/A","N/A",""],
+["Buoyancy Control Device","Marine","A block with adjustable buoyancy.","3 kg","2 × 4 × 2","250","N/A","N/A","N/A",""],
+["Straight Hull Block","Marine","A hull block that provides buoyancy.","12 kg","4 × 4 × 4","600","N/A","N/A","N/A",""],
+["Corner Hull Block","Marine","A corner hull block that provides buoyancy.","12 kg","4 × 4 × 4","600","N/A","N/A","N/A",""],
+["Middle Hull Block","Marine","A middle hull block that provides buoyancy.","12 kg","4 × 4 × 4","600","N/A","N/A","N/A",""],
+["Ship's Keel","Marine","A keel component for a ship.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Ship's Bow","Marine","A bow component for a ship.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Paddle","Marine","Used to move water.","0.8 kg","2 × 4 × 1","200","N/A","N/A","N/A","Wiki extraction showed 0.8 g; not treated as verified."],
+["Large Paddle","Marine","A larger paddle for moving water.","2 kg","4 × 4 × 1","250","N/A","N/A","N/A",""],
+["Oar","Marine","Used to move water.","0.8 kg","1 × 4 × 1","200","N/A","N/A","N/A",""],
+["Outboard Boat Engine","Marine","Provides propulsion in water.","12.5 kg","2 × 2 × 4","150","2","Not listed","N/A",""],
+["Underwater Propeller","Marine","Provides underwater propulsion.","12.5 kg","2 × 4 × 2","150","1","Not listed","N/A",""],
+["Small Modular Rectangle Sail","Marine","A modular rectangular sail.","1.5 kg","1 × 6 × 9","250","N/A","N/A","N/A",""],
+["Big Modular Rectangle Sail","Marine","A large modular rectangular sail.","1.5 kg","1 × 9 × 12","250","N/A","N/A","N/A",""],
+["Small Modular Triangle Sail","Marine","A modular triangular sail.","1.5 kg","1 × 6 × 9","250","N/A","N/A","N/A",""],
+["Big Modular Triangle Sail","Marine","A large modular triangular sail.","1.5 kg","1 × 9 × 12","250","N/A","N/A","N/A",""],
+["Tall Modular Triangle Sail","Marine","A tall modular triangular sail.","1.5 kg","1 × 9 × 24","250","N/A","N/A","N/A",""],
+
+/* GADGETS - NON-COMBAT UTILITY */
+["Anchor Pin","Gadgets","Creates an unbreakable connection between the vehicle and an object it touches.","0.3 kg","1 × 1 × 1","1500","N/A","N/A","N/A",""],
+["Camera Block","Gadgets","Switches the camera view to this block.","0.3 kg","1 × 1 × 1","200","N/A","N/A","N/A",""],
+["Tractor Beam","Gadgets","Attracts loose objects such as salvage, blocks, and artifacts when activated.","7.5 kg","2 × 2 × 2","200","1","N/A","N/A",""],
+["Headlamp","Gadgets","Lights up the environment.","1.6 kg","1 × 1 × 1","200","N/A","N/A","N/A",""],
+["Headlamp v2","Gadgets","A compact light for illuminating the environment.","0.3 kg","1 × 1 × 1","200","N/A","N/A","N/A",""],
+["Large Headlamp","Gadgets","A larger headlamp that illuminates more of the environment.","4 kg","2 × 2 × 2","200","N/A","N/A","N/A",""],
+["Taillight","Gadgets","A light component for vehicle visibility.","1.6 kg","1 × 1 × 1","200","N/A","N/A","N/A",""],
+["Taillight v2","Gadgets","A compact vehicle light.","0.3 kg","1 × 1 × 1","200","N/A","N/A","N/A",""],
+["Pop-up Car Light","Gadgets","A pop-up vehicle light.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Diagonal Compound Light","Gadgets","A compound light component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Rounded Compound Light","Gadgets","A rounded compound light component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Flat Compound Light","Gadgets","A flat compound light component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Beach Ball Dispenser","Gadgets","Dispenses beach balls.","3.7 kg","2 × 2 × 4","400","1","N/A","N/A",""],
+["Snowball Dispenser","Gadgets","Dispenses snowballs.","3.7 kg","2 × 2 × 4","400","1","N/A","N/A",""],
+["Concrete Wall Dispenser","Gadgets","Dispenses concrete walls.","3.1 kg","2 × 2 × 3","400","2","N/A","N/A",""],
+["Metal Crate Dispenser","Gadgets","Dispenses metal crates.","3.7 kg","2 × 2 × 4","400","2","N/A","N/A",""],
+["Dice Dispenser","Gadgets","Dispenses dice.","3.7 kg","2 × 2 × 4","400","1","N/A","N/A",""],
+
+/* DECORATION */
+["Blue Neon","Decoration","Decorative blue neon light.","1 kg","4 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Red Neon","Decoration","Decorative red neon light.","1 kg","4 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Yellow Neon","Decoration","Decorative yellow neon light.","1 kg","4 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Jack-o'-lantern","Decoration","A themed decorative block.","2 kg","1 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Siren","Decoration","A siren decoration.","0.75 kg","1 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Ship's Lantern","Decoration","A lantern for ship builds.","1.5625 kg","1 × 1 × 1","Not listed","N/A","N/A","None","High Seas DLC"],
+["Fire Pit","Decoration","A decorative fire pit.","0.5 kg","2 × 2 × 1","Not listed","N/A","N/A","None",""],
+["Sconce","Decoration","A wall-mounted light decoration.","0.5 kg","1 × 1 × 2","Not listed","N/A","N/A","None",""],
+["Emergency Light","Decoration","An emergency light component.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Signal Flare","Decoration","A signal flare decoration.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Sharp Air Intake","Decoration","An air intake decoration.","1.5 kg","2 × 2 × 1","Not listed","N/A","N/A","None",""],
+["Air Intake","Decoration","An air intake decoration.","2 kg","2 × 2 × 1","Not listed","N/A","N/A","None",""],
+["Rounded Air Intake","Decoration","A rounded air intake decoration.","2 kg","2 × 2 × 1","Not listed","N/A","N/A","None",""],
+["Hood Pipes","Decoration","Decorative hood pipes.","3 kg","2 × 2 × 1","Not listed","N/A","N/A","None",""],
+["80s Exhaust","Decoration","A retro exhaust decoration.","3.1 kg","2 × 2 × 2","Not listed","N/A","N/A","None",""],
+["Exhaust With Muffler","Decoration","An exhaust decoration with muffler.","0.5 kg","2 × 3 × 1","Not listed","N/A","N/A","None",""],
+["Long Exhaust","Decoration","A long exhaust decoration.","1 kg","1 × 4 × 1","Not listed","N/A","N/A","None",""],
+["Buggy Exhaust","Decoration","A buggy-style exhaust decoration.","0.5 kg","1 × 3 × 1","Not listed","N/A","N/A","None",""],
+["Triple Exhaust","Decoration","A triple exhaust decoration.","0.5 kg","1 × 4 × 2","Not listed","N/A","N/A","None",""],
+["Smoke Generator","Decoration","Emits coloured smoke.","Not listed","Not listed","Not listed","N/A","N/A","Not listed","Produces tintable smoke."],
+["Large Exhaust","Decoration","A large exhaust decoration.","Not listed","Not listed","Not listed","N/A","N/A","Not listed",""],
+["Smoke Trail Device","Decoration","Creates a coloured smoke trail when activated.","5 kg","2 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Bubble Maker","Decoration","Produces bubbles.","0.5 kg","2 × 2 × 2","Not listed","N/A","N/A","None",""],
+["Mad Science Block","Decoration","A themed decorative block.","5 kg","2 × 2 × 1","Not listed","N/A","N/A","None",""],
+["Rainbow Maker","Decoration","Creates a rainbow effect.","9.6 kg","2 × 2 × 2","Not listed","N/A","N/A","None",""],
+["Simple Ladder","Decoration","A ladder decoration.","2 kg","2 × 2 × 3","Not listed","N/A","N/A","None",""],
+["Round Metal Tube","Decoration","A round metal tube decoration.","1.5 kg","2 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Roof Rack","Decoration","A roof rack decoration.","2.2322 kg","2 × 2 × 1","Not listed","N/A","N/A","None",""],
+["Metal Barrel Hood","Decoration","A barrel-style hood decoration.","12.5 kg","2 × 4 × 1","Not listed","N/A","N/A","None",""],
+["Rubber Shark Fin","Decoration","A shark-fin decoration.","5 kg","2 × 2 × 3","Not listed","N/A","N/A","None",""],
+["Short Hood","Decoration","A short hood cover.","1.25 kg","2 × 2 × 1","Not listed","N/A","N/A","None",""],
+["Long Hood","Decoration","A long hood cover.","0.5 kg","2 × 4 × 1","Not listed","N/A","N/A","None",""],
+["Large Side View Mirror","Decoration","A large side-view mirror.","0.625 kg","2 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Side View Mirror","Decoration","A side-view mirror.","0.15 kg","1 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Round Side View Mirror","Decoration","A rounded side-view mirror.","0.15 kg","1 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Periscope","Decoration","A periscope decoration.","3 kg","1 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Rib Cage Pipes","Decoration","A decorative wall of pipes.","2.5 kg","4 × 4 × 1","Not listed","N/A","N/A","None",""],
+["Stop Sign","Decoration","A stop sign decoration.","2.35 kg","1 × 2 × 2","Not listed","N/A","N/A","None",""],
+["Wind Propeller","Decoration","A decorative wind propeller.","1.5 kg","2 × 2 × 6","Not listed","N/A","N/A","None",""],
+["Coffee Mug","Decoration","A coffee mug decoration.","0.75 kg","1 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Lab Flask","Decoration","A laboratory flask decoration.","0.75 kg","1 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Bottle","Decoration","A bottle decoration.","0.75 kg","1 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Greeble 2x4","Decoration","A decorative techno-detail block.","2.5 kg","2 × 4 × 1","Not listed","N/A","N/A","None",""],
+["Greeble 2x1","Decoration","A small decorative techno-detail block.","0.3125 kg","2 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Greeble 2x2","Decoration","A decorative techno-detail block.","1.25 kg","2 × 2 × 1","Not listed","N/A","N/A","None",""],
+["Dish Antenna","Decoration","A decorative dish antenna.","0.4616 kg","2 × 2 × 2","Not listed","N/A","N/A","None",""],
+["Stick Antenna","Decoration","A decorative stick antenna.","0.4616 kg","1 × 1 × 5","Not listed","N/A","N/A","None",""],
+["Parabola","Decoration","A decorative parabola antenna.","0.4616 kg","2 × 2 × 2","Not listed","N/A","N/A","None",""],
+["Antenna Array","Decoration","A decorative antenna array.","0.4616 kg","2 × 2 × 3","Not listed","N/A","N/A","None",""],
+["Monkey Flag","Decoration","A decorative flag.","1 kg","1 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Thug Life Flag","Decoration","A decorative flag.","1 kg","1 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Troll Flag","Decoration","A decorative flag.","1 kg","1 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Lightning Flag","Decoration","A decorative flag.","1 kg","1 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Rainbow Flag","Decoration","A decorative flag.","1 kg","1 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Penguin Flag","Decoration","A decorative flag.","1 kg","1 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Chicken Flag","Decoration","A decorative flag.","1 kg","1 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Poo Flag","Decoration","A decorative flag.","1 kg","1 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Star Flag","Decoration","A decorative flag.","1 kg","1 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Skull'n'Wrench Flag","Decoration","A decorative flag.","1 kg","1 × 1 × 4","Not listed","N/A","N/A","None",""],
+["Wind Sock","Decoration","A windsock decoration.","0.205 kg","1 × 1 × 2","Not listed","N/A","N/A","None","High Seas DLC"],
+["Flat Eye","Decoration","A flat round eye decoration.","0.35 kg","2 × 1 × 2","Not listed","N/A","N/A","None",""],
+["Eyeball","Decoration","A spherical eye decoration.","0.1636 kg","1 × 1 × 1","Not listed","N/A","N/A","None",""],
+["Large Tooth","Decoration","A large tooth decoration.","1.25 kg","2 × 1 × 2","Not listed","N/A","N/A","None",""],
+["Cuckoo Hood","Decoration","A themed hood ornament.","1.5 kg","1 × 2 × 1","Not listed","N/A","N/A","None",""],
+["Swine Hood","Decoration","A themed hood ornament.","5 kg","2 × 2 × 2","Not listed","N/A","N/A","None",""],
+["Rock 'n' Roll Hood","Decoration","A themed hood ornament.","1.75 kg","1 × 1 × 2","Not listed","N/A","N/A","None",""],
+["Snake Hood","Decoration","A themed hood ornament.","0.5 kg","4 × 2 × 1","Not listed","N/A","N/A","None",""]
+];
+
+const blocks=rawBlocks.map(r=>({name:r[0],category:r[1],description:r[2],weight:r[3],size:r[4],hp:r[5],cores:r[6],power:r[7],aero:r[8],other:r[9]}));
+
+const logicGuides=[
+{name:"AND Logic Gate",purpose:"Outputs when all of its inputs are active (non-zero).",example:"Connect two independent status signals. Use the output to illuminate a dashboard indicator only when both conditions are met.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"OR Logic Gate",purpose:"Outputs when any input is non-zero.",example:"Connect two separate button inputs to one OR gate. Either button can activate the same harmless indicator.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"XOR Logic Gate",purpose:"Outputs when exactly one input is non-zero.",example:"Use two selectable inputs to create a status light that activates when one, but not both, of the inputs is active.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"NOR Logic Gate",purpose:"Outputs when all inputs are zero.",example:"Use it for an indicator that turns on only when none of several optional conditions are active.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Comparison Logic Gate",purpose:"Compares the sum of its inputs with a configured value. Comparison options include equal, not equal, greater, greater-or-equal, less, and less-or-equal.",example:"Compare a speed-related numeric signal with a chosen reference value and display whether it is above or below that value.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Accumulator",purpose:"Stores a value and changes it according to its inputs and configured scaling. The stored value can be limited in its configuration.",example:"Use a button input to increment a stored demonstration counter, then send the value to a Number Display. Test the scaling and limits in a small build.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Number Display",purpose:"Displays the current numeric input, with optional rounding.",example:"Connect a numeric signal to the display to show a value while testing a vehicle system.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Arithmetic Logic Block",purpose:"Performs arithmetic using a configured constant and the sum of its inputs. Operations include addition, subtraction, multiplication, division, and expanded operations in newer versions.",example:"Use it to scale a sensor value for a dashboard readout. Start with a simple known input and verify the result on a Number Display.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Hue Light Panel",purpose:"Changes its colour based on the input. Positive values use a hue gradient; negative values use grayscale.",example:"Connect a sensor or math output to the panel and observe how its colour changes as the value changes.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Distance Sensor",purpose:"Sends an output when an object enters the configured distance from the sensing side.",example:"Use it to activate a small visual proximity indicator when an object is nearby.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Speed Sensor",purpose:"Sends an output based on the vehicle's speed in the direction the sensor faces.",example:"Connect it to a dashboard light to indicate when the vehicle passes a chosen speed threshold.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Altitude Sensor",purpose:"Sends an output when the block reaches a configured altitude relative to the water level.",example:"Use it to switch on a visual indicator when a flying build reaches a chosen height.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Gravity Sensor",purpose:"Sends an output based on the gravity experienced by the build.",example:"Use it as a source for a simple numeric or visual experiment, observing how the output changes in different environments.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Angle Sensor",purpose:"Sends an output when the block reaches a configured angle relative to its up direction.",example:"Use it to illuminate an indicator when a moving test component reaches a selected angle.",stats:"1.2 kg · 1 × 2 × 2 · 200 HP"},
+{name:"Compass",purpose:"Provides a signal based on the direction the block faces relative to north.",example:"Connect it to a display or indicator to experiment with heading changes as the vehicle turns.",stats:"1.2 kg · 1 × 2 × 2 · 200 HP"},
+{name:"Functions Logic Block",purpose:"Applies a mathematical function to the sum of its inputs. Listed modes include Absolute, Sign, Square Root, Sin, Cos, Tan, ArcSin, ArcCos, ArcTan, Ceiling, Rounding, and Floor.",example:"Use the Absolute function to turn a negative or positive numeric input into a non-negative value, then display the result.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Aggregate Logic Block",purpose:"Combines inputs using Sum, Product, Minimum, or Maximum.",example:"Connect several numeric test signals and use Minimum or Maximum to display the smallest or largest value.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"},
+{name:"Randomizer",purpose:"Generates random numbers within a configured range. The wiki lists Output on Input, Change on Input, Input Defines Range, and -Change +Output modes.",example:"Use it to generate a changing value for a decorative Number Display or Hue Light Panel experiment.",stats:"0.6 kg · 1 × 2 × 1 · 200 HP"}
+];
+
+const generalGuides=[
+{name:"Start with a stable frame",body:"Build a balanced central frame before adding details. A tidy base makes it easier to identify what causes problems.",example:"Create a basic chassis, add the seat, and test the shape before attaching decorative pieces."},
+{name:"Balance your vehicle",body:"Mass distribution affects how a vehicle behaves. Uneven weight can change its handling.",example:"Make small placement adjustments and test after each change."},
+{name:"Test in stages",body:"Avoid adding every system at once. Staged testing makes problems easier to isolate.",example:"Test the frame first, then movement, steering, and optional features."},
+{name:"Use symmetry as a starting point",body:"Symmetry can make a vehicle easier to balance. It is a useful starting point, even if the final design is asymmetrical.",example:"Build matching left and right sides, then adjust after testing."},
+{name:"Keep controls organized",body:"Give each control a clear purpose. Too many unrelated functions on one input can make a build difficult to operate.",example:"Keep steering, auxiliary movement, and utility functions on clearly separated controls."},
+{name:"Understand aerodynamics",body:"The shape and orientation of a flying vehicle affect how it moves through the air.",example:"Change wing placement one step at a time and compare results in a consistent test."},
+{name:"Use small test builds",body:"Test unfamiliar components on a small build before integrating them into a larger project.",example:"Create a small test chassis to understand a hinge or sensor."},
+{name:"Save useful versions",body:"Keep a working copy before making major changes so you can return to a known-good design.",example:"Save a stable version, then experiment on a separate copy."},
+{name:"Check block orientation",body:"Some components behave differently depending on their orientation.",example:"Test a component in a simple setup and rotate it to compare its behavior."},
+{name:"Use the grid deliberately",body:"The wiki defines one grid unit as 0.25 metres per side. Thinking in grid dimensions helps estimate how parts will fit.",example:"A 2 × 2 × 2 block occupies a 0.5 metre cube."}
+];
+
+let currentPage="overview",currentCategory="All",currentBlockQuery="";
+function showPage(page,push=true){
+if(!pageNames[page])page="overview";currentPage=page;
+$$(".page").forEach(el=>el.classList.toggle("active",el.id==="page-"+page));
+$$(".nav-link").forEach(el=>el.classList.toggle("active",el.dataset.page===page));
+$("#breadcrumb").textContent="CROW Industries / "+pageNames[page];
+if(push)history.pushState({page},"","#"+page);
+if(getPrefs().remember)localStorage.setItem("crow-last-page",page);
+window.scrollTo({top:0,behavior:"smooth"});closeSearch();
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-page]");if(b)showPage(b.dataset.page)});
+window.addEventListener("popstate",e=>showPage(e.state?.page||location.hash.slice(1)||"overview",false));
+
+function renderGames(query=""){
+const filtered=games.filter(g=>(g.name+" "+g.description).toLowerCase().includes(query.toLowerCase()));
+$("#gameGrid").innerHTML=filtered.length?filtered.map(g=>`
+<article class="card game-card ${g.active?"trail":""} ${g.page?"clickable":"disabled"}" ${g.page?`data-page="${g.page}"`:""}>
+<div><div class="card-top"><span class="tag">${g.active?"RESOURCE CENTER":"GAME LIBRARY"}</span><span class="status ${g.status==="Incomplete"?"incomplete":g.status==="Planned"?"":"progress"}">${esc(g.status)}</span></div>
+<h3>${esc(g.name)}${g.name==="Minecraft"?' <span class="muted" style="font-size:12px">(Incomplete)</span>':""}</h3><p>${esc(g.description)}</p></div>
+<div class="game-meta"><span class="muted">${g.page?"Open resource center":"Content coming later"}</span><span class="arrow">${g.page?"→":"—"}</span></div></article>`).join(""):`<div class="empty" style="grid-column:1/-1">No games match that search.</div>`;
+}
+$("#gameSearch").addEventListener("input",e=>renderGames(e.target.value));
+
+const categories=["All","Seats","Movement","Structure","Streamlining","Flight","Marine","Gadgets","Decoration"];
+function renderCategoryTabs(){
+$("#categoryTabs").innerHTML=categories.map(c=>`<button class="category-tab ${c===currentCategory?"active":""}" data-category="${esc(c)}">${esc(c)}</button>`).join("");
+}
+function renderBlocks(){
+const q=currentBlockQuery.toLowerCase();
+const filtered=blocks.filter(b=>(currentCategory==="All"||b.category===currentCategory)&&(b.name+" "+b.description+" "+b.category).toLowerCase().includes(q));
+$("#blockCount").textContent=`${filtered.length} entries shown · ${blocks.length} database entries`;
+$("#blockList").innerHTML=filtered.length?filtered.map(b=>`<button class="block-item" data-block="${esc(b.name)}"><strong>${esc(b.name)}</strong><small>${esc(b.category)} · View details →</small></button>`).join(""):`<div class="empty" style="grid-column:1/-1">No blocks match that search.</div>`;
+}
+function renderBlockDetail(name){
+const b=blocks.find(x=>x.name===name);if(!b)return;
+const stats=[["Weight",b.weight],["Grid size",b.size],["Hit points",b.hp],["Power cores",b.cores],["Power",b.power],["Aerodynamics",b.aero],["Category",b.category],["Other information",b.other||"Not listed"]];
+$("#blockDetail").innerHTML=`<div class="block-detail"><button class="back-link" id="closeBlockDetail">← Close block details</button><div class="eyebrow">${esc(b.category)} · BLOCK INFORMATION</div><h2>${esc(b.name)}</h2><p>${esc(b.description)}</p><div class="stat-grid">${stats.map(([k,v])=>`<div class="stat"><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div></div>`;
+}
+$("#categoryTabs").addEventListener("click",e=>{const b=e.target.closest("[data-category]");if(!b)return;currentCategory=b.dataset.category;renderCategoryTabs();renderBlocks()});
+$("#blockList").addEventListener("click",e=>{const b=e.target.closest("[data-block]");if(b)renderBlockDetail(b.dataset.block)});
+$("#blockSearch").addEventListener("input",e=>{currentBlockQuery=e.target.value;renderBlocks()});
+$("#blockDetail").addEventListener("click",e=>{if(e.target.closest("#closeBlockDetail"))$("#blockDetail").innerHTML=""});
+
+function renderGuides(container,guides,logic=false){
+$(container).innerHTML=guides.map((g,i)=>`<details class="guide"><summary><span>${i+1}. ${esc(g.name)}</span></summary>
+<p>${esc(logic?g.purpose:g.body)}</p>${logic?`<p class="muted">${esc(g.stats)}</p>`:""}
+<div class="example"><strong>Example</strong><br>${esc(g.example)}</div></details>`).join("");
+}
+$("#trailTabs").addEventListener("click",e=>{
+const b=e.target.closest("[data-tab]");if(!b)return;
+$$("#trailTabs .tab").forEach(t=>t.classList.toggle("active",t===b));
+$$(".tab-panel").forEach(p=>p.classList.toggle("active",p.id==="tab-"+b.dataset.tab));
+});
+
+$("#previewInquiry").addEventListener("click",()=>{
+const name=$("#inquiryName").value.trim(),description=$("#inquiryDescription").value.trim(),out=$("#inquiryPreview");
+out.hidden=false;out.innerHTML=`<strong>Inquiry preview</strong><p><b>Project:</b> ${esc(name||"Untitled project")}</p><p>${esc(description||"No description provided.")}</p><p class="muted">Preview only — nothing has been submitted or transmitted.</p>`;
+});
+
+/* Global search */
+const searchOverlay=$("#searchOverlay");
+function openSearch(){searchOverlay.classList.add("open");$("#globalSearch").value="";renderGlobalSearch("");setTimeout(()=>$("#globalSearch").focus(),20)}
+function closeSearch(){searchOverlay.classList.remove("open")}
+$("#openSearch").addEventListener("click",openSearch);
+searchOverlay.addEventListener("click",e=>{if(e.target===searchOverlay)closeSearch()});
+document.addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();openSearch()}if(e.key==="Escape")closeSearch()});
+$("#globalSearch").addEventListener("input",e=>renderGlobalSearch(e.target.value));
+function renderGlobalSearch(query){
+const results=[],q=query.trim().toLowerCase();
+if(!q){$("#searchResults").innerHTML=`<div class="search-empty">Search company pages, games, and Trailmakers blocks.</div>`;return}
+Object.entries(pageNames).forEach(([key,name])=>{if(name.toLowerCase().includes(q))results.push({title:name,desc:"Company page",page:key})});
+games.forEach(g=>{if((g.name+" "+g.description).toLowerCase().includes(q))results.push({title:g.name,desc:"CROW Gaming · "+g.status,page:g.page||"gaming"})});
+blocks.forEach(b=>{if((b.name+" "+b.description+" "+b.category).toLowerCase().includes(q))results.push({title:b.name,desc:"Trailmakers block · "+b.category,page:"trailmakers",block:b.name})});
+const unique=results.filter((x,i)=>results.findIndex(y=>y.title===x.title&&y.page===x.page)===i).slice(0,30);
+$("#searchResults").innerHTML=unique.length?unique.map((x,i)=>`<button class="search-result" data-result="${i}">${esc(x.title)}<small>${esc(x.desc)}</small></button>`).join(""):`<div class="search-empty">No results found.</div>`;
+$("#searchResults").dataset.results=JSON.stringify(unique);
+}
+$("#searchResults").addEventListener("click",e=>{
+const b=e.target.closest("[data-result]");if(!b)return;
+const list=JSON.parse($("#searchResults").dataset.results||"[]"),r=list[Number(b.dataset.result)];if(!r)return;
+showPage(r.page);
+if(r.block){$("#trailTabs [data-tab='blocks']").click();currentCategory="All";renderCategoryTabs();renderBlocks();renderBlockDetail(r.block)}
+});
+
+/* Preferences */
+const defaultPrefs={compact:false,motion:false,remember:true};
+function getPrefs(){try{return{...defaultPrefs,...JSON.parse(localStorage.getItem("crow-preferences")||"{}")}}catch{return{...defaultPrefs}}}
+function savePrefs(p){
+localStorage.setItem("crow-preferences",JSON.stringify(p));
+document.body.classList.toggle("compact",!!p.compact);document.body.classList.toggle("reduce-motion",!!p.motion);
+$("#prefCompact").checked=!!p.compact;$("#prefMotion").checked=!!p.motion;$("#prefRemember").checked=!!p.remember;
+}
+$("#openPreferences").addEventListener("click",()=>showPage("preferences"));
+["prefCompact","prefMotion","prefRemember"].forEach(id=>$("#"+id).addEventListener("change",()=>{
+const p={compact:$("#prefCompact").checked,motion:$("#prefMotion").checked,remember:$("#prefRemember").checked};savePrefs(p);if(!p.remember)localStorage.removeItem("crow-last-page");
+}));
+$("#resetPrefs").addEventListener("click",()=>savePrefs({...defaultPrefs}));
+
+/* Initial setup */
+renderGames();renderCategoryTabs();renderBlocks();
+renderGuides("#logicGuides",logicGuides,true);renderGuides("#generalGuides",generalGuides,false);
+savePrefs(getPrefs());
+const saved=getPrefs().remember?localStorage.getItem("crow-last-page"):null;
+const initial=location.hash.slice(1)||saved||"overview";
+showPage(pageNames[initial]?initial:"overview",false);
+</script>
+</body>
+</html>
